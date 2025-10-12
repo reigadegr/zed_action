@@ -21,7 +21,7 @@ export RUSTFLAGS="
     -C code-model=small
     -C linker-plugin-lto=no
     -C default-linker-libraries
-    -C relocation-model=static
+    -C relocation-model=pic
     -C symbol-mangling-version=v0
     -C llvm-args=-fp-contract=off
     -C llvm-args=-enable-misched
