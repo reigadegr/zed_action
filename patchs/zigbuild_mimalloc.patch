@@ -1,0 +1,19 @@
+commit 0aeb4517ab76f1c497662e69c8c52de39e0d501b
+Author: reigadegr <2722688642@qq.com>
+Date:   Fri Aug 29 17:22:59 2025 +0800
+
+    zigbuild mimalloc
+
+diff --git a/cargo-zigbuild/src/bin/cargo-zigbuild.rs b/cargo-zigbuild/src/bin/cargo-zigbuild.rs
+index 327abdb..b8377cc 100644
+--- a/cargo-zigbuild/src/bin/cargo-zigbuild.rs
++++ b/cargo-zigbuild/src/bin/cargo-zigbuild.rs
+@@ -37,6 +37,8 @@ pub enum Opt {
+     External(Vec<OsString>),
+ }
+ 
++#[global_allocator]
++static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
+ fn main() -> anyhow::Result<()> {
+     let mut args = env::args();
+     let program_path = PathBuf::from(args.next().expect("no program path"));
