@@ -79,7 +79,7 @@ jobs:
       - name: Build
         working-directory: zed
         run: |
-          cargo b -r --all-features
+          cargo b -r --features mimalloc
 
       - name: Archive windows build
         uses: actions/upload-artifact@v4

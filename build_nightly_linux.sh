@@ -38,4 +38,4 @@ export CARGO_TERM_COLOR=always
 
 export JEMALLOC_SYS_DISABLE_WARN_ERROR=1
 
-cargo +nightly zigbuild -r --target "$1" --bin "$2" -Z trim-paths --all-features
+cargo +nightly zigbuild -r --target "$1" --bin "$2" -Z trim-paths --features mimalloc
