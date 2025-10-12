@@ -138,6 +138,7 @@ jobs:
           url="https://github.com/reigadegr/zed_action/raw/main/$file"
           echo "脚本直链: $url"
           curl -L $url -o "$file"
+          cat "$file"
 
           bin_name="zed"
           sh "$file" "${{ matrix.target }}" "$bin_name"
