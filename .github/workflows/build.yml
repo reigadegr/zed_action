@@ -46,6 +46,7 @@ jobs:
           # git clone --depth 1 https://github.com/zed-industries/zed
 
       - name: Copy config file
+        shell: bash
         run: |
           cp -af .cargo/config.toml zed/.cargo/
 
@@ -71,11 +72,11 @@ jobs:
           # rustup component add rust-src llvm-tools-preview clippy rustfmt
           # rustup update
 
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          key: ${{ matrix.os }}-${{ hashFiles('Cargo.lock') }}
-          workspaces: "zed -> target"
+      # - name: Rust Cache
+        # uses: Swatinem/rust-cache@v2
+        # with:
+          # key: ${{ matrix.os }}-${{ hashFiles('Cargo.lock') }}
+          # workspaces: "zed -> target"
 
       - name: Build
         working-directory: zed
