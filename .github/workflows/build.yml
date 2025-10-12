@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: zed-industries/zed
-          ref: refs/tags/v0.208.3-pre
+          ref: refs/tags/v0.201.9
           path: zed
 
       # - name: Setup zed code
@@ -60,7 +60,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
+          toolchain: nightly
           target: wasm32-wasip1
 
       # - name: Setup rust toolchains
@@ -81,7 +81,28 @@ jobs:
       - name: Build
         working-directory: zed
         run: |
-          cargo b -r --features mimalloc
+          toolchain="nightly"
+          platform="${{ contains(runner.os, 'Windows') && 'windows' || (contains(runner.os, 'apple') && 'apple' || 'linux') }}"
+          file="build_"$toolchain"_"$platform".sh"
+          url="https://github.com/reigadegr/zed_action/raw/main/$file"
+          echo "脚本直链: $url"
+          curl -L $url -o "$file"
+          cat "$file"; ls -al
+          bin_name="zed"
+          if [ "$platform" = "windows" ]; then
+              sh "$file" "x86_64-pc-windows-msvc" "$bin_name"
+          fi
+
+          if [ "$platform" = "linux" ]; then
+              sh "$file" "x86_64-unknown-linux-gnu" "$bin_name"
+          fi
+
+          is_windows="${{ contains(github.event.inputs.TARGET, 'windows') && 'true' || 'false' }}"
+          if [ "$is_windows" = "true" ]; then
+              bin_name=$bin_name.exe
+          fi
+          file="$(find target -name "$bin_name")"
+          echo "$(realpath $file)"
 
       - name: Archive windows build
         uses: actions/upload-artifact@v4
