@@ -3,6 +3,13 @@ name: Build
 on:
   workflow_dispatch:
 
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+  # Optimize build performance
+  CARGO_INCREMENTAL: 0
+  TZ: Asia/Shanghai
+
 jobs:
   build:
     strategy:
