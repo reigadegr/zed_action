@@ -7,6 +7,13 @@ export RUSTFLAGS="
     -C default-linker-libraries
     -C relocation-model=static
     -C symbol-mangling-version=v0
+    -C llvm-args=-fp-contract=off
+    -C llvm-args=-enable-misched
+    -C llvm-args=-enable-post-misched
+    -C llvm-args=-enable-dfa-jump-thread
+    -C link-args=-Wl,--sort-section=alignment
+    -C link-args=-Wl,-O2,--gc-sections,--as-needed
+    -C link-args=-Wl,-x,-z,noexecstack,-s,--strip-all
 "
 
 cargo update
