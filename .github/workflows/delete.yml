@@ -1,0 +1,194 @@
+name: 清理工作流运行记录和缓存
+
+on:
+  workflow_dispatch:
+    inputs:
+      workflow_name:
+        type: choice
+        description: '清理的工作流名称'
+        required: true
+        default: 'Release Build'
+        options:
+          - Release Build
+          - Build
+      count:
+        description: '最多访问的运行次数'
+        required: false
+        default: '20'
+      delete_failed:
+        description: '删除指定工作流失败的运行记录？'
+        required: false
+        type: boolean
+        default: true
+      delete_success:
+        description: '删除指定工作流成功的运行记录？'
+        required: false
+        type: boolean
+        default: false
+      delete_cancelled:
+        description: '删除指定工作流取消的运行记录？'
+        required: false
+        type: boolean
+        default: false
+      reverse_order:
+        description: '从旧到新开始清理？'
+        required: false
+        type: boolean
+        default: false
+      clear_cache:
+        description: '是否删除所有缓存？'
+        required: false
+        type: boolean
+        default: false
+      cancel_all:
+        description: '是否一键取消指定工作流的所有运行？'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  actions: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 安装环境
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gh jq
+
+      - name: 认证 GitHub CLI
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+      - name: 清理指定工作流运行记录
+        env:
+          REPO: ${{ github.repository }}
+          COUNT: ${{ inputs.count }}
+          DELETE_FAILED: ${{ inputs.delete_failed }}
+          DELETE_SUCCESS: ${{ inputs.delete_success }}
+          DELETE_CANCELLED: ${{ inputs.delete_cancelled }}
+          REVERSE_ORDER: ${{ inputs.reverse_order }}
+          CANCEL_ALL: ${{ inputs.cancel_all }}
+          WORKFLOW_NAME: ${{ inputs.workflow_name }}
+          CURRENT_RUN_ID: ${{ github.run_id }}
+        run: |
+          set -e
+
+          echo "查找工作流 \"$WORKFLOW_NAME\" 的 ID..."
+          WORKFLOW_ID=$(gh api repos/$REPO/actions/workflows | jq -r ".workflows[] | select(.name == \"$WORKFLOW_NAME\") | .id")
+          if [ -z "$WORKFLOW_ID" ]; then
+            echo "未找到工作流 \"$WORKFLOW_NAME\"，退出。"
+            exit 1
+          fi
+
+          echo "开始分页获取所有运行记录..."
+          PER_PAGE=100
+          PAGE=1
+          ALL_RUNS="[]"
+          while true; do
+            RESP=$(gh api "repos/$REPO/actions/workflows/$WORKFLOW_ID/runs?per_page=$PER_PAGE&page=$PAGE")
+            RUNS=$(echo "$RESP" | jq '.workflow_runs')
+            COUNT_THIS_PAGE=$(echo "$RUNS" | jq 'length')
+            if [ "$COUNT_THIS_PAGE" -eq 0 ]; then break; fi
+            ALL_RUNS=$(jq -s 'add' <(echo "$ALL_RUNS") <(echo "$RUNS"))
+            PAGE=$((PAGE + 1))
+          done
+
+          echo "共获取到 $(echo "$ALL_RUNS" | jq 'length') 条运行记录。"
+
+          if [[ "$CANCEL_ALL" == "true" ]]; then
+            echo "开始取消进行中或排队中的运行..."
+            CANCEL_COUNT=0
+            echo "$ALL_RUNS" | jq -c '.[] | select(.status == "in_progress" or .status == "queued")' | while read run; do
+              ID=$(echo "$run" | jq -r '.id')
+              if [[ "$ID" == "$CURRENT_RUN_ID" ]]; then continue; fi
+              echo "取消运行 ID: $ID"
+              gh api -X POST "repos/$REPO/actions/runs/$ID/cancel" && CANCEL_COUNT=$((CANCEL_COUNT + 1))
+            done
+            echo "已取消 $CANCEL_COUNT 条运行。"
+          fi
+
+          echo "开始处理删除逻辑..."
+          if [[ "$REVERSE_ORDER" == "true" ]]; then
+            SORTED_RUNS=$(echo "$ALL_RUNS" | jq 'sort_by(.run_started_at)')
+          else
+            SORTED_RUNS=$(echo "$ALL_RUNS" | jq 'sort_by(.run_started_at) | reverse')
+          fi
+
+          TO_DELETE_RUNS=$(echo "$SORTED_RUNS" | jq ".[0:${COUNT}]")
+
+          echo "$TO_DELETE_RUNS" | jq -c '.[]' | while read run; do
+            ID=$(echo "$run" | jq -r '.id')
+            STATUS=$(echo "$run" | jq -r '.conclusion')
+            STATE=$(echo "$run" | jq -r '.status')
+
+            if [[ "$STATE" == "in_progress" || "$STATE" == "queued" ]]; then continue; fi
+            if [[ "$STATUS" == "failure" && "$DELETE_FAILED" != "true" ]]; then continue; fi
+            if [[ "$STATUS" == "success" && "$DELETE_SUCCESS" != "true" ]]; then continue; fi
+            if [[ "$STATUS" == "cancelled" && "$DELETE_CANCELLED" != "true" ]]; then continue; fi
+
+            echo "删除运行记录 ID: $ID"
+            gh api -X DELETE "repos/$REPO/actions/runs/$ID" || echo "删除失败"
+          done
+
+          echo "清理本工作流运行记录（排除当前运行）..."
+          SELF_WORKFLOW_ID=$(gh api repos/$REPO/actions/workflows | jq -r '.workflows[] | select(.name == "清理工作流运行记录和缓存") | .id')
+          if [ -n "$SELF_WORKFLOW_ID" ]; then
+            SELF_RUNS=$(gh api "repos/$REPO/actions/workflows/$SELF_WORKFLOW_ID/runs?per_page=50" | jq -c '.workflow_runs[]')
+            echo "$SELF_RUNS" | while read run; do
+              ID=$(echo "$run" | jq -r '.id')
+              if [[ "$ID" == "$CURRENT_RUN_ID" ]]; then continue; fi
+              echo "删除本工作流运行记录 ID: $ID"
+              gh api -X DELETE "repos/$REPO/actions/runs/$ID" || echo "删除失败"
+            done
+          fi
+
+  clean-caches:
+    runs-on: ubuntu-latest
+    needs: cleanup
+    if: ${{ inputs.clear_cache == true || inputs.clear_cache == 'true' }}
+    permissions:
+      actions: write
+    steps:
+      - name: 删除并重置缓存 (ccache + apt-cache)
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            let totalDeleted = 0;
+            let page = 1;
+
+            while (true) {
+              const res = await github.rest.actions.getActionsCacheList({
+                owner,
+                repo,
+                per_page: 100,
+                page: page
+              });
+
+              const caches = res.data.actions_caches;
+              if (!caches || caches.length === 0) break;
+
+              for (const cache of caches) {
+                if (
+                  cache.key.startsWith('ccache-') ||
+                  cache.key.includes('apt-cache') ||
+                  cache.key.includes('apt')
+                ) {
+                  console.log(`删除缓存: ${cache.key}`);
+                  await github.rest.actions.deleteActionsCacheById({
+                    owner,
+                    repo,
+                    cache_id: cache.id
+                  });
+                  totalDeleted++;
+                }
+              }
+
+              if (caches.length < 100) break;
+              page++;
+            }
+
+            console.log(`共删除缓存数量: ${totalDeleted}`);
