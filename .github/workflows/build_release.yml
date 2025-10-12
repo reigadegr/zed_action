@@ -22,11 +22,6 @@ on:
           - "x86_64-pc-windows-msvc"
           - "aarch64-apple-darwin"
           - "x86_64-apple-darwin"
-      HASH:
-        type: string
-        description: "自定义提交哈希以debug"
-        required: false
-        default: ""
 
 permissions:
   contents: read
@@ -102,10 +97,8 @@ jobs:
       - name: Clone zed sources
         shell: bash
         run: |
-          git clone https://github.com/zed-industries/zed zed_tmpdir
+          git clone --depth 1 https://github.com/zed-industries/zed zed_tmpdir
           cd zed_tmpdir
-          commit_hash="${{ github.event.inputs.HASH }}"
-          git reset --hard "$(basename "$commit_hash")" || true
           cd  ..
           mv zed_tmpdir/*  .
           rm -rf zed_tmpdir rust-toolchain.toml || true
