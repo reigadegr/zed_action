@@ -1,0 +1,168 @@
+name: Release Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      TOOLCHAINS:
+        type: choice
+        description: "使用的工具链"
+        required: true
+        default: "nightly"
+        options:
+          - "nightly"
+          - "stable"
+      TARGET:
+        type: choice
+        description: "编译的目标三元组"
+        required: true
+        default: "x86_64-pc-windows-msvc"
+        options:
+          - "aarch64-unknown-linux-musl"
+          - "x86_64-unknown-linux-musl"
+          - "x86_64-pc-windows-msvc"
+          - "aarch64-apple-darwin"
+          - "x86_64-apple-darwin"
+      HASH:
+        type: string
+        description: "自定义提交哈希以debug"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+  # Optimize build performance
+  CARGO_INCREMENTAL: 0
+  TZ: Asia/Shanghai
+
+jobs:
+  # Build strategy check - determine build type based on trigger
+  build-check:
+    name: Build Strategy Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Debug Show Selected Inputs
+        run: |
+          echo "-----------------------"
+          echo "Selected TOOLCHAINS: ${{ github.event.inputs.TOOLCHAINS }}"
+          echo "Selected TARGET: ${{ github.event.inputs.TARGET }}"
+          echo "Selected USE_MIMALLOC: ${{ github.event.inputs.USE_MIMALLOC }}"
+          echo "Selected HASH: ${{ github.event.inputs.HASH }}"
+          echo "-----------------------"
+
+  # Build zed binaries
+  build-zed:
+    name: Build Utils
+    needs: [build-check]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    env:
+      RUSTFLAGS: ${{ matrix.cross == 'false' && '-C target-cpu=native' || '' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux builds
+          - os: ${{ contains(github.event.inputs.TARGET, 'windows') && 'windows' || (contains(github.event.inputs.TARGET, 'apple') && 'macos' || 'ubuntu') }}-latest
+            target: ${{ github.event.inputs.TARGET }}
+            cross: ${{ contains(github.event.inputs.TARGET, 'linux') && 'true' || 'false' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Rust environment
+        uses: ./.github/actions/setup
+        with:
+          rust-version: ${{ github.event.inputs.TOOLCHAINS }}
+          target: ${{ matrix.target }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          install-cross-tools: ${{ matrix.cross }}
+
+      - name: Configure Git
+        shell: bash
+        run: |
+          git config --global user.name "Numbersf"
+          git config --global user.email "263623064@qq.com"
+
+      - name: Setup TimeZone
+        if: runner.os == 'Linux'
+        run: |
+          sudo -E rm -rf /etc/localtime
+          sudo -E ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+      - name: Clone zed sources
+        shell: bash
+        run: |
+          git clone https://github.com/zed-industries/zed zed_tmpdir
+          cd zed_tmpdir
+          commit_hash="${{ github.event.inputs.HASH }}"
+          git reset --hard "$(basename "$commit_hash")" || true
+          cd  ..
+          mv zed_tmpdir/*  .
+          rm -rf zed_tmpdir rust-toolchain.toml || true
+          sed -i 's#mimalloc = { version = "0.1"#mimalloc = { version = "0.1.48"#g' crates/zed/Cargo.toml
+          cargo add mimalloc --features override,no_thp,v3 -p zed
+
+      - name: Fix upstream bugs
+        shell: bash
+        run: |
+          git init || echo "无需init"
+          rm -rf target && echo "删除了target" || echo "无需删除"
+          git add  . && git commit -m "auto commit"
+
+          for i in "full_opt.patch"; do
+             url="https://github.com/reigadegr/zed-builds/raw/main/patchs/$i"
+             echo "补丁直链: $url"
+             curl -L $url -o "$i"
+             patch -p1 -F 3 < $i && git add  . && git commit -m "$i commit" || git reset --hard
+             git clean -df
+          done
+
+      - name: Build zed
+        shell: bash
+        run: |
+          rm -rf target && echo "删除了target" || echo "无需删除"
+          toolchain="${{ github.event.inputs.TOOLCHAINS }}"
+          platform="${{ contains(github.event.inputs.TARGET, 'windows') && 'windows' || (contains(github.event.inputs.TARGET, 'apple') && 'apple' || 'linux') }}"
+          file="build_"$toolchain"_"$platform".sh"
+
+          url="https://github.com/reigadegr/zed-builds/raw/main/$file"
+          echo "脚本直链: $url"
+          curl -L $url -o "$file"
+
+          bin_name="zed"
+          sh "$file" "${{ matrix.target }}" "$bin_name"
+
+          is_windows="${{ contains(github.event.inputs.TARGET, 'windows') && 'true' || 'false' }}"
+          if [ "$is_windows" = "true" ]; then
+              bin_name=$bin_name.exe
+          fi
+          file="$(find target -name "$bin_name")"
+          echo "$(realpath $file)"
+          mkdir -p ${{ github.event.inputs.TARGET }}_module || echo "已有默认目录"
+          dd if=target/"${{ matrix.target }}"/release/$bin_name of=./"${{ matrix.target }}"_module/$bin_name
+          git log > ./"${{ matrix.target }}"_module/commits.txt
+
+      - name: Fix post setup rust environment step
+        shell: bash
+        run: |
+          rm -rf .github/actions/setup || echo "不需要删除目录"
+          mkdir -p .github/actions/setup || echo "不需要创建目录"
+          curl -L https://github.com/reigadegr/zed-builds/raw/main/.github/actions/setup/action.yml -o .github/actions/setup/action.yml
+
+      - name: Upload to GitHub artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.event.inputs.TARGET }}_zed
+          path: ${{ matrix.target }}_module/*
+          retention-days: 3
