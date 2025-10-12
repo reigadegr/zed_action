@@ -32,7 +32,7 @@ export RUSTFLAGS="
     -C link-args=-Wl,-x,-z,noexecstack,-s,--strip-all
 " 
 
-cargo update
+#cargo update
 
 export CARGO_TERM_COLOR=always
 
