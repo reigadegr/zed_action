@@ -4,7 +4,7 @@ export RUSTFLAGS="
     -C relro-level=none
     -C code-model=small
     -C linker-plugin-lto=no
-    -C relocation-model=static
+    -C relocation-model=pic
     -C symbol-mangling-version=v0
 " 
 
