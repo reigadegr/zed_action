@@ -54,7 +54,6 @@ jobs:
           echo "-----------------------"
           echo "Selected TOOLCHAINS: ${{ github.event.inputs.TOOLCHAINS }}"
           echo "Selected TARGET: ${{ github.event.inputs.TARGET }}"
-          echo "Selected USE_MIMALLOC: ${{ github.event.inputs.USE_MIMALLOC }}"
           echo "Selected HASH: ${{ github.event.inputs.HASH }}"
           echo "-----------------------"
 
@@ -121,7 +120,7 @@ jobs:
           git add  . && git commit -m "auto commit"
 
           for i in "full_opt.patch"; do
-             url="https://github.com/reigadegr/zed-builds/raw/main/patchs/$i"
+             url="https://github.com/reigadegr/zed_action/raw/main/patchs/$i"
              echo "补丁直链: $url"
              curl -L $url -o "$i"
              patch -p1 -F 3 < $i && git add  . && git commit -m "$i commit" || git reset --hard
@@ -136,7 +135,7 @@ jobs:
           platform="${{ contains(github.event.inputs.TARGET, 'windows') && 'windows' || (contains(github.event.inputs.TARGET, 'apple') && 'apple' || 'linux') }}"
           file="build_"$toolchain"_"$platform".sh"
 
-          url="https://github.com/reigadegr/zed-builds/raw/main/$file"
+          url="https://github.com/reigadegr/zed_action/raw/main/$file"
           echo "脚本直链: $url"
           curl -L $url -o "$file"
 
@@ -158,7 +157,7 @@ jobs:
         run: |
           rm -rf .github/actions/setup || echo "不需要删除目录"
           mkdir -p .github/actions/setup || echo "不需要创建目录"
-          curl -L https://github.com/reigadegr/zed-builds/raw/main/.github/actions/setup/action.yml -o .github/actions/setup/action.yml
+          curl -L https://github.com/reigadegr/zed_action/raw/main/.github/actions/setup/action.yml -o .github/actions/setup/action.yml
 
       - name: Upload to GitHub artifacts
         uses: actions/upload-artifact@v4

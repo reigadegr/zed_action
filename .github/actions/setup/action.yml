@@ -116,7 +116,7 @@ runs:
         git clone --depth 1 https://github.com/rust-cross/cargo-zigbuild
         cd cargo-zigbuild
         cargo add mimalloc --features no_thp,override,v3
-        wget https://github.com/reigadegr/zed-builds/raw/main/patchs/zigbuild_mimalloc.patch
+        wget https://github.com/reigadegr/zed_action/raw/main/patchs/zigbuild_mimalloc.patch
         patch -p2 -F 3 < zigbuild_mimalloc.patch
         cargo update
         cargo build -r
@@ -150,7 +150,7 @@ runs:
     - name: reinstall self code
       shell: bash
       run: |
-        git clone --depth 1 https://github.com/reigadegr/zed-builds zed-builds_sources
-        cp -rf zed-builds_sources/*  .
-        cp -rf zed-builds_sources/.*  . || echo "可能是macos，不需要单独cp.*"
-        rm -rf zed-builds_sources
+        git clone --depth 1 https://github.com/reigadegr/zed_action zed_action_sources
+        cp -rf zed_action_sources/*  .
+        cp -rf zed_action_sources/.*  . || echo "可能是macos，不需要单独cp.*"
+        rm -rf zed_action_sources
