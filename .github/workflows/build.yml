@@ -33,12 +33,17 @@ jobs:
       - name: Checkout self
         uses: actions/checkout@v4
 
-      - name: Checkout zed
-        uses: actions/checkout@v4
-        with:
-          repository: zed-industries/zed
-          ref: refs/tags/v0.201.9
-          path: zed
+      # - name: Checkout zed
+        # uses: actions/checkout@v4
+        # with:
+          # repository: zed-industries/zed
+          # ref: refs/tags/v0.201.9
+          # path: zed
+
+      - name: Setup rust toolchains
+        shell: bash
+        run: |
+          git clone --depth 1 https://github.com/zed-industries/zed
 
       - name: Copy config file
         run: |
@@ -50,20 +55,20 @@ jobs:
           sudo apt update
           sudo apt install -y libx11-dev libasound2-dev libx11-xcb-dev libxkbcommon-dev libxkbcommon-x11-dev
 
-      # - name: Install Rust
-        # uses: dtolnay/rust-toolchain@stable
-        # with:
-          # toolchain: stable
-          # target: wasm32-wasip1
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          target: wasm32-wasip1
 
-      - name: Setup rust toolchains
-        shell: bash
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain nightly --profile minimal -y
-          export toolchain="nightly"
-          rustup default "$toolchain"
-          rustup component add rust-src llvm-tools-preview clippy rustfmt
-          rustup update
+      # - name: Setup rust toolchains
+        # shell: bash
+        # run: |
+          # curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain nightly --profile minimal -y
+          # export toolchain="nightly"
+          # rustup default "$toolchain"
+          # rustup component add rust-src llvm-tools-preview clippy rustfmt
+          # rustup update
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
