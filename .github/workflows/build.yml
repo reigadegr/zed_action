@@ -49,14 +49,14 @@ jobs:
           # toolchain: stable
           # target: wasm32-wasip1
 
-    - name: Setup rust toolchains
-      shell: bash
-      run: |
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain nightly --profile minimal -y
-        export toolchain="nightly"
-        rustup default "$toolchain"
-        rustup component add rust-src llvm-tools-preview clippy rustfmt
-        rustup update
+      - name: Setup rust toolchains
+        shell: bash
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain nightly --profile minimal -y
+          export toolchain="nightly"
+          rustup default "$toolchain"
+          rustup component add rust-src llvm-tools-preview clippy rustfmt
+          rustup update
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
