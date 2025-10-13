@@ -24,6 +24,7 @@ export RUSTFLAGS="
     -C target-cpu=native
     -C target-feature=+crt-static
     -C symbol-mangling-version=v0
+    -C link-arg=/OPT:REF,ICF
 " 
 
 export RUSTFLAGS+="
