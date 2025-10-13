@@ -72,14 +72,15 @@ jobs:
           # rustup component add rust-src llvm-tools-preview clippy rustfmt
           # rustup update
 
-      # - name: Rust Cache
-        # uses: Swatinem/rust-cache@v2
-        # with:
-          # key: ${{ matrix.os }}-${{ hashFiles('Cargo.lock') }}
-          # workspaces: "zed -> target"
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.os }}-${{ hashFiles('Cargo.lock') }}
+          workspaces: "zed -> target"
 
       - name: Build
         working-directory: zed
+        shell: bash
         run: |
           toolchain="nightly"
           platform="${{ contains(runner.os, 'Windows') && 'windows' || (contains(runner.os, 'apple') && 'apple' || 'linux') }}"
