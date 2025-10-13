@@ -161,7 +161,7 @@ jobs:
           sudo -E rm -rf /etc/localtime
           sudo -E ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
-      - name: Replace malloctor
+      - name: Replace mallocator
         shell: bash
         run: |
           sed -i 's#mimalloc = { version = "0.1"#mimalloc = { version = "0.1.48"#g' crates/zed/Cargo.toml
