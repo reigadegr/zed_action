@@ -107,6 +107,7 @@ runs:
         rustup component add rust-src llvm-tools-preview clippy rustfmt
         rustup component add rust-src --toolchain "$toolchain"-"${{ inputs.target }}"
         rustup target add "${{ inputs.target }}" --toolchain "$toolchain"
+        rustup target add wasm32-wasip1
         rustup update
 
     - name: Install cargo-zigbuild
