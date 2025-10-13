@@ -65,17 +65,6 @@ runs:
          echo "1000" | sudo -E tee /sys/kernel/mm/lru_gen/min_ttl_ms
          echo "1" | sudo -E tee /sys/kernel/mm/swap/vma_ra_enabled
 
-    - name: Install protoc
-      uses: arduino/setup-protoc@v3
-      with:
-        version: "31.1"
-        repo-token: ${{ inputs.github-token }}
-
-    - name: Install flatc
-      uses: Nugine/setup-flatc@v1
-      with:
-        version: "25.2.10"
-
     - name: Install Rust toolchain
       uses: dtolnay/rust-toolchain@stable
       with:
@@ -90,9 +79,6 @@ runs:
     - name: Install cargo-zigbuild
       if: inputs.install-cross-tools == 'true'
       uses: taiki-e/install-action@cargo-zigbuild
-
-    - name: Install cargo-nextest
-      uses: taiki-e/install-action@cargo-nextest
 
     - name: Setup rust musl toolchains
       shell: bash
