@@ -1,3 +1,7 @@
+[build]
+# v0 mangling scheme provides more detailed backtraces around closures
+rustflags = ["-C", "symbol-mangling-version=v0", "--cfg", "tokio_unstable"]
+
 [target.'cfg(target_os = "windows")']
 rustflags = [
   "-C",

@@ -14,17 +14,17 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-24.04, windows-2022]
+        os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Enable long paths in git
-        if: matrix.os == 'windows-2022'
+        if: runner.os == 'Windows'
         run: |
           git config --system core.longpaths true
 
       - name: Enable long paths in windows
-        if: matrix.os == 'windows-2022'
+        if: runner.os == 'Windows'
         shell: powershell
         run: |
           New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" `
@@ -33,17 +33,17 @@ jobs:
       - name: Checkout self
         uses: actions/checkout@v4
 
-      - name: Checkout zed
-        uses: actions/checkout@v4
-        with:
-          repository: zed-industries/zed
-          ref: refs/tags/v0.201.9
-          path: zed
+      # - name: Checkout zed
+        # uses: actions/checkout@v4
+        # with:
+          # repository: zed-industries/zed
+          # ref: refs/tags/v0.201.9
+          # path: zed
 
-      # - name: Setup zed code
-        # shell: bash
-        # run: |
-          # git clone --depth 1 https://github.com/zed-industries/zed
+      - name: Setup zed code
+        shell: bash
+        run: |
+          git clone --depth 1 https://github.com/zed-industries/zed
 
       - name: Copy config file
         shell: bash
@@ -112,3 +112,5 @@ jobs:
           path: |
             zed/target/release/zed
             zed/target/release/zed.exe
+            zed/target/x86_64-pc-windows-msvc/release/zed.exe
+            zed/target/x86_64-unknown-linux-gnu/release/zed
