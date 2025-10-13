@@ -104,6 +104,7 @@ jobs:
           cd zed_tmpdir
           git clone --depth 1 https://github.com/reigadegr/zed-translation zed_translation
           python zed_translation/2.trans.py
+          git diff | head -n 200
           rm -rf zed_translation
 
       - name: Upload preprocessing code
