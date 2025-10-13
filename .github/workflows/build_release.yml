@@ -105,8 +105,6 @@ jobs:
           git clone --depth 1 https://github.com/zed-industries/zed zed_tmpdir
           mv zed_tmpdir/*  .
           rm -rf zed_tmpdir rust-toolchain.toml || true
-          sed -i 's#mimalloc = { version = "0.1"#mimalloc = { version = "0.1.48"#g' crates/zed/Cargo.toml
-          cargo add mimalloc --features override,no_thp,v3 -p zed
 
       - name: Localize Zed into Chinese
         if: ${{ github.event.inputs.TRANSLATION == 'true' }}
@@ -116,6 +114,12 @@ jobs:
           python zed_translation/2.trans.py
           rm -rf zed_translation
           git init; git add .; git commit -m "汉化完毕"
+
+      - name: Replace malloctor
+        shell: bash
+        run: |
+          sed -i 's#mimalloc = { version = "0.1"#mimalloc = { version = "0.1.48"#g' crates/zed/Cargo.toml
+          cargo add mimalloc --features override,no_thp,v3 -p zed
 
       - name: Fix upstream bugs
         shell: bash
