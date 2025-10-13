@@ -24,7 +24,7 @@ on:
           - "x86_64-apple-darwin"
       TRANSLATION:
         type: boolean
-        description: "是否汉化为中文？"
+        description: "是否汉化？"
         required: true
         default: false
 
