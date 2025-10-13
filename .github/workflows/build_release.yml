@@ -17,13 +17,16 @@ on:
         required: true
         default: "x86_64-pc-windows-msvc"
         options:
-          - "aarch64-unknown-linux-musl"
-          - "x86_64-unknown-linux-musl"
           - "aarch64-unknown-linux-gnu"
           - "x86_64-unknown-linux-gnu"
           - "x86_64-pc-windows-msvc"
           - "aarch64-apple-darwin"
           - "x86_64-apple-darwin"
+      TRANSLATION:
+        type: boolean
+        description: "是否汉化为中文？"
+        required: true
+        default: false
 
 permissions:
   contents: read
@@ -106,6 +109,15 @@ jobs:
           rm -rf zed_tmpdir rust-toolchain.toml || true
           sed -i 's#mimalloc = { version = "0.1"#mimalloc = { version = "0.1.48"#g' crates/zed/Cargo.toml
           cargo add mimalloc --features override,no_thp,v3 -p zed
+
+      - name: Localize Zed into Chinese
+        if: ${{ github.event.inputs.TRANSLATION == 'true' }}
+        shell: bash
+        run: |
+          git clone --depth 1 https://github.com/reigadegr/zed-translation zed_translation
+          python zed_translation/2.trans.py
+          rm -rf zed_translation
+          git add .; git commit -m "汉化完毕"
 
       - name: Fix upstream bugs
         shell: bash
