@@ -40,7 +40,7 @@ runs:
       if: runner.os == 'Linux'
       uses: awalsh128/cache-apt-pkgs-action@latest 
       with: 
-        packages: musl-tools build-essential lld llvm clang libdbus-1-dev libwayland-dev libwebkit2gtk-4.1-dev libxdo-dev pkg-config libssl-dev libx11-dev libasound2-dev libx11-xcb-dev libxkbcommon-dev libxkbcommon-x11-dev
+        packages: musl-tools build-essential lld llvm clang libdbus-1-dev libwayland-dev libwebkit2gtk-4.1-dev libxdo-dev pkg-config libssl-dev libx11-dev libasound2-dev libx11-xcb-dev libxkbcommon-dev libxkbcommon-x11-dev python3 python-is-python3
         execute_install_scripts: true
 
     - name: Optimize Memory Management
