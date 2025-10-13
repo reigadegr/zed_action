@@ -54,7 +54,7 @@ jobs:
           echo "-----------------------"
           echo "Selected TOOLCHAINS: ${{ github.event.inputs.TOOLCHAINS }}"
           echo "Selected TARGET: ${{ github.event.inputs.TARGET }}"
-          echo "Selected HASH: ${{ github.event.inputs.HASH }}"
+          echo "Selected TRANSLATION: ${{ github.event.inputs.TRANSLATION }}"
           echo "-----------------------"
 
   # Build zed binaries
@@ -103,8 +103,6 @@ jobs:
         shell: bash
         run: |
           git clone --depth 1 https://github.com/zed-industries/zed zed_tmpdir
-          cd zed_tmpdir
-          cd  ..
           mv zed_tmpdir/*  .
           rm -rf zed_tmpdir rust-toolchain.toml || true
           sed -i 's#mimalloc = { version = "0.1"#mimalloc = { version = "0.1.48"#g' crates/zed/Cargo.toml
