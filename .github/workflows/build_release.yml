@@ -57,9 +57,8 @@ jobs:
           echo "Selected TRANSLATION: ${{ github.event.inputs.TRANSLATION }}"
           echo "-----------------------"
 
-  # Build zed binaries
-  build-zed:
-    name: Build Utils
+  preprocessing-code:
+    name: Preprocessing Code
     needs: [build-check]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
@@ -70,6 +69,63 @@ jobs:
       matrix:
         include:
           # Linux builds
+          - os: "ubuntu-latest"
+            target: ${{ github.event.inputs.TARGET }}
+            cross: ${{ contains(github.event.inputs.TARGET, 'linux') && 'true' || 'false' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install system dependencies (Ubuntu)
+        uses: awalsh128/cache-apt-pkgs-action@latest 
+        with: 
+          packages: llvm clang git python3 python-is-python3
+          execute_install_scripts: true
+
+      - name: Configure Git
+        shell: bash
+        run: |
+          git config --global user.name "Numbersf"
+          git config --global user.email "263623064@qq.com"
+
+      - name: Clone zed sources
+        shell: bash
+        run: |
+          git clone --depth 1 https://github.com/zed-industries/zed zed_tmpdir
+          cd zed_tmpdir/
+          rm -rf .git rust-toolchain.toml || true
+
+      - name: Localize Zed into Chinese
+        if: ${{ github.event.inputs.TRANSLATION == 'true' }}
+        shell: bash
+        run: |
+          cd zed_tmpdir
+          git clone --depth 1 https://github.com/reigadegr/zed-translation zed_translation
+          python zed_translation/2.trans.py
+          rm -rf zed_translation
+
+      - name: Upload preprocessing code
+        uses: actions/upload-artifact@v4
+        with:
+          name: zed_preprocessing_code
+          compression-level: 1
+          path: zed_tmpdir/*
+
+  # Build zed binaries
+  build-zed:
+    name: Build Utils
+    needs: [build-check,preprocessing-code]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    env:
+      RUSTFLAGS: ${{ matrix.cross == 'false' && '-C target-cpu=native' || '' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Platform builds
           - os: ${{ contains(github.event.inputs.TARGET, 'windows') && 'windows' || (contains(github.event.inputs.TARGET, 'apple') && 'macos' || 'ubuntu') }}-latest
             target: ${{ github.event.inputs.TARGET }}
             cross: ${{ contains(github.event.inputs.TARGET, 'linux') && 'true' || 'false' }}
@@ -99,21 +155,10 @@ jobs:
           sudo -E rm -rf /etc/localtime
           sudo -E ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
-      - name: Clone zed sources
-        shell: bash
-        run: |
-          git clone --depth 1 https://github.com/zed-industries/zed zed_tmpdir
-          mv zed_tmpdir/*  .
-          rm -rf zed_tmpdir rust-toolchain.toml || true
-
-      - name: Localize Zed into Chinese
-        if: ${{ github.event.inputs.TRANSLATION == 'true' }}
-        shell: bash
-        run: |
-          git clone --depth 1 https://github.com/reigadegr/zed-translation zed_translation
-          python zed_translation/2.trans.py
-          rm -rf zed_translation
-          git init; git add .; git commit -m "汉化完毕"
+      - name: Download zed preprocessing code
+        uses: actions/download-artifact@v4
+        with:
+          name: zed_preprocessing_code
 
       - name: Replace malloctor
         shell: bash
