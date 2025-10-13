@@ -32,6 +32,10 @@ export RUSTFLAGS="
     -C link-args=-Wl,-x,-z,noexecstack,-s,--strip-all
 " 
 
+export RUSTFLAGS+="
+    --cfg tokio_unstable
+"
+
 # cargo update
 
 export CARGO_TERM_COLOR=always

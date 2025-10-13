@@ -26,6 +26,12 @@ export RUSTFLAGS="
     -C symbol-mangling-version=v0
 " 
 
+export RUSTFLAGS+="
+    --cfg tokio_unstable
+    --cfg windows_slim_errors
+"
+
+echo $RUSTFLAGS
 # cargo update
 
 export CARGO_TERM_COLOR=always

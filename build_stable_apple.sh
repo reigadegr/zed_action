@@ -8,6 +8,10 @@ export RUSTFLAGS="
     -C symbol-mangling-version=v0
 " 
 
+export RUSTFLAGS+="
+    --cfg tokio_unstable
+"
+
 # cargo update
 
 export CARGO_TERM_COLOR=always
