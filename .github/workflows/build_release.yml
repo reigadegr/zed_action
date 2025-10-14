@@ -124,7 +124,7 @@ jobs:
 
   # Build zed binaries
   build-zed:
-    name: Build Utils
+    name: Build Zed
     needs: [build-check,preprocessing-code]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 180
