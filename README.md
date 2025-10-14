@@ -41,7 +41,7 @@
 4. 配置构建参数:
    - **TOOLCHAINS**: 选择 `nightly` 或 `stable`
    - **TARGET**: 选择目标平台
-   - **TRANSLATION**: 是否启用中文本地化 [2](#0-1) 
+   - **TRANSLATION**: 是否启用中文本地化
 
 ### 构建产物
 
@@ -49,7 +49,7 @@
 - 文件名格式: `{TARGET}_zed`
 - 包含内容: 
   - `zed` 或 `zed.exe` 可执行文件
-  - `commits.txt` 源码提交历史 [3](#0-2) 
+  - `commits.txt` 源码提交历史
 
 ## 🏗️ 架构设计
 
@@ -64,7 +64,7 @@ graph LR
 
 1. **build-check**: 验证输入参数和构建策略
 2. **preprocessing-code**: 源码克隆和本地化处理 (Ubuntu)
-3. **build-zed**: 平台特定编译 (Linux/Windows/macOS) [4](#0-3) 
+3. **build-zed**: 平台特定编译 (Linux/Windows/macOS)
 
 ### 环境优化
 
