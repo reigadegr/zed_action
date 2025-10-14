@@ -26,7 +26,6 @@
 | 平台 | 架构 | Target Triplet |
 |------|------|----------------|
 | Linux | x86_64 | `x86_64-unknown-linux-gnu` |
-| Linux | ARM64 | `aarch64-unknown-linux-gnu` |
 | Windows | x86_64 | `x86_64-pc-windows-msvc` |
 | macOS | x86_64 | `x86_64-apple-darwin` |
 | macOS | Apple Silicon | `aarch64-apple-darwin` |

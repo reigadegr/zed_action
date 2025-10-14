@@ -17,7 +17,6 @@ on:
         required: true
         default: "x86_64-pc-windows-msvc"
         options:
-          - "aarch64-unknown-linux-gnu"
           - "x86_64-unknown-linux-gnu"
           - "x86_64-pc-windows-msvc"
           - "aarch64-apple-darwin"
