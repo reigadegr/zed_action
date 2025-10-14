@@ -13,7 +13,7 @@
 
 ## ✨ 特性
 
-- 🚀 **多平台支持**: Linux (x86_64)、Windows (x86_64)、macOS (x86_64/Apple Silicon)
+- 🚀 **多平台支持**: Linux (x86_64/aarch64)、Windows (x86_64/aarch64)、macOS (x86_64/Apple Silicon)
 - 🔧 **双工具链**: 支持 Rust stable 和 nightly 工具链
 - 🌏 **中文本地化**: 可选集成 tc999/zed-loc 和 reigadegr/zed-translation
 - ⚡ **性能优化**: 内置编译器优化补丁和内存管理调优
@@ -24,7 +24,9 @@
 | 平台 | 架构 | Target Triplet |
 |------|------|----------------|
 | Linux | x86_64 | `x86_64-unknown-linux-gnu` |
+| Linux | aarch64 | `aarch64-unknown-linux-gnu` |
 | Windows | x86_64 | `x86_64-pc-windows-msvc` |
+| Windows | aarch64 | `aarch64-pc-windows-msvc` |
 | macOS | x86_64 | `x86_64-apple-darwin` |
 | macOS | Apple Silicon | `aarch64-apple-darwin` |
 
@@ -47,7 +49,8 @@
 - 包含内容: 
   - `zed` 或 `zed.exe` 可执行文件
   - `commits.txt` 源码提交历史
-
+  - `zed_last_commit.txt` zed最新提交信息
+  
 ## 🏗️ 架构设计
 
 ### 三阶段构建流程
