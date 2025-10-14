@@ -11,8 +11,9 @@ export RUSTFLAGS="
     -C linker=rust-lld
 " 
 
-export RUSTFLAGS+="
-    --cfg tokio_unstable
+export RUSTFLAGS="
+    $RUSTFLAGS
+    --cfg tokio_unstable 
     --cfg windows_slim_errors
 "
 

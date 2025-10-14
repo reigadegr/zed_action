@@ -33,7 +33,8 @@ export RUSTFLAGS="
 " 
 
 export RUSTFLAGS="
-    $RUSTFLAGS --cfg tokio_unstable
+    $RUSTFLAGS
+    --cfg tokio_unstable
 "
 
 echo $RUSTFLAGS

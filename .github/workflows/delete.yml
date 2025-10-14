@@ -10,7 +10,7 @@ on:
         default: 'Release Build'
         options:
           - Release Build
-          - Build
+          - Debug Build
       count:
         description: '最多访问的运行次数'
         required: false

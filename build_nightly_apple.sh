@@ -24,7 +24,8 @@ export RUSTFLAGS="
     -C symbol-mangling-version=v0
 " 
 
-export RUSTFLAGS+="
+export RUSTFLAGS="
+    $RUSTFLAGS
     --cfg tokio_unstable
 "
 
