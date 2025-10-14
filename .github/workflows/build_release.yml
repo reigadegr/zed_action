@@ -93,12 +93,17 @@ jobs:
       - name: Clone zed sources
         shell: bash
         run: |
-          git clone --depth 1 https://github.com/tc999/zed-loc zed_loc
+          if [ "${{ github.event.inputs.TRANSLATION }}" = "true" ]; then
+              git clone --depth 1 https://github.com/tc999/zed-loc zed_loc
+          else
+              mkdir zed_loc
+          fi
+
           cd zed_loc
           git clone --depth 1 https://github.com/zed-industries/zed
-          python3 replace.py
-          
-          rm -rf .git rust-toolchain.toml || true
+          if [ "${{ github.event.inputs.TRANSLATION }}" = "true" ]; then
+              python3 replace.py
+          fi
 
       - name: Localize Zed into Chinese
         if: ${{ github.event.inputs.TRANSLATION == 'true' }}
@@ -108,7 +113,7 @@ jobs:
           git clone --depth 1 https://github.com/reigadegr/zed-translation zed_translation
           python zed_translation/2.trans.py
           git diff | wc -l
-          rm -rf zed_translation
+          rm -rf zed_translation .git rust-toolchain.toml || true
 
       - name: Upload preprocessing code
         uses: actions/upload-artifact@v4
