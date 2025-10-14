@@ -63,8 +63,6 @@ jobs:
     needs: [build-check]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
-    env:
-      RUSTFLAGS: ${{ matrix.cross == 'false' && '-C target-cpu=native' || '' }}
     strategy:
       fail-fast: false
       matrix:
@@ -72,7 +70,6 @@ jobs:
           # Linux builds
           - os: "ubuntu-latest"
             target: ${{ github.event.inputs.TARGET }}
-            cross: ${{ contains(github.event.inputs.TARGET, 'linux') && 'true' || 'false' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -132,8 +129,6 @@ jobs:
     needs: [build-check,preprocessing-code]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 180
-    env:
-      RUSTFLAGS: ${{ matrix.cross == 'false' && '-C target-cpu=native' || '' }}
     strategy:
       fail-fast: false
       matrix:
@@ -141,7 +136,6 @@ jobs:
           # Platform builds
           - os: ${{ contains(github.event.inputs.TARGET, 'windows') && 'windows' || (contains(github.event.inputs.TARGET, 'apple') && 'macos' || 'ubuntu') }}-${{ contains(github.event.inputs.TARGET, 'linux') && '24.04' || contains(github.event.inputs.TARGET, 'apple') && 'latest' || contains(github.event.inputs.TARGET, 'aarch64') && '11' || 'latest' }}${{ contains(github.event.inputs.TARGET, 'aarch64') && !contains(github.event.inputs.TARGET, 'apple') && '-arm' || '' }}
             target: ${{ github.event.inputs.TARGET }}
-            cross: ${{ contains(github.event.inputs.TARGET, 'linux') && 'true' || 'false' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -154,7 +148,6 @@ jobs:
           rust-version: ${{ github.event.inputs.TOOLCHAINS }}
           target: ${{ matrix.target }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          install-cross-tools: ${{ matrix.cross }}
 
       - name: Configure Git
         shell: bash

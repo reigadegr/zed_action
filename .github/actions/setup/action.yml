@@ -20,10 +20,6 @@ inputs:
     description: "Rust version to install"
     required: false
     default: "stable"
-  install-cross-tools:
-    description: "Install cross-compilation tools"
-    required: false
-    default: "false"
   target:
     description: "Target architecture to add"
     required: false
@@ -72,14 +68,6 @@ runs:
         targets: ${{ inputs.target }}
         components: rustfmt, clippy
 
-    - name: Install Zig
-      if: inputs.install-cross-tools == 'true'
-      uses: mlugg/setup-zig@v2
-
-    - name: Install cargo-zigbuild
-      if: inputs.install-cross-tools == 'true'
-      uses: taiki-e/install-action@cargo-zigbuild
-
     - name: Setup rust musl toolchains
       shell: bash
       run: |
@@ -95,25 +83,6 @@ runs:
         rustup target add "${{ inputs.target }}" --toolchain "$toolchain"
         rustup target add wasm32-wasip1
         rustup update
-
-    - name: Install cargo-zigbuild
-      if: inputs.install-cross-tools == 'true'
-      shell: bash
-      run: |
-        git clone --depth 1 https://github.com/rust-cross/cargo-zigbuild
-        cd cargo-zigbuild
-        cargo add mimalloc --features no_thp,override,v3
-        wget https://github.com/reigadegr/zed_action/raw/main/patchs/zigbuild_mimalloc.patch
-        patch -p2 -F 3 < zigbuild_mimalloc.patch
-        cargo update
-        cargo build -r
-        dd if=target/release/cargo-zigbuild of=./cargo-zigbuild
-        rm -rf target
-        sudo -E cp -af ./cargo-zigbuild ~/.cargo/bin/cargo-zigbuild
-        sudo -E chmod +x ~/.cargo/bin/cargo-zigbuild
-        ls ~/.cargo/bin
-        which cargo-zigbuild || true
-        cd  ..; rm -rf cargo-zigbuild
 
     - name: Setup NASM
       if: runner.os == 'Windows'
