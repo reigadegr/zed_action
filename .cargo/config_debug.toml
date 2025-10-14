@@ -1,0 +1,24 @@
+[build]
+# v0 mangling scheme provides more detailed backtraces around closures
+rustflags = ["-C", "symbol-mangling-version=v0", "--cfg", "tokio_unstable"]
+
+[target.'cfg(target_os = "windows")']
+rustflags = [
+  "-C",
+  "target-cpu=native",
+  "--cfg",
+  "windows_slim_errors",
+  "-C",
+  "target-feature=+crt-static"
+]
+
+[profile.release]
+overflow-checks = false
+codegen-units = 4
+lto = false
+opt-level = 0
+strip = true
+debug = 0
+debug-assertions = false
+incremental = false
+panic = "abort"
