@@ -136,11 +136,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download zed preprocessing code
-        uses: actions/download-artifact@v4
-        with:
-          name: zed_preprocessing_code
-
       - name: Setup Rust environment
         uses: ./.github/actions/setup
         with:
@@ -160,6 +155,11 @@ jobs:
         run: |
           sudo -E rm -rf /etc/localtime
           sudo -E ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+      - name: Download zed preprocessing code
+        uses: actions/download-artifact@v4
+        with:
+          name: zed_preprocessing_code
 
       - name: Replace mallocator
         shell: bash
