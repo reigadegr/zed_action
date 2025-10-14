@@ -32,8 +32,8 @@ export RUSTFLAGS="
     -C link-args=-Wl,-x,-z,noexecstack,-s,--strip-all
 " 
 
-export RUSTFLAGS+="
-    --cfg tokio_unstable
+export RUSTFLAGS="
+    $RUSTFLAGS --cfg tokio_unstable
 "
 
 # cargo update
