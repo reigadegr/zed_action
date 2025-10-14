@@ -172,8 +172,8 @@ jobs:
       - name: Replace mallocator
         shell: bash
         run: |
-          sed -i 's#mimalloc = { version = "0.1"#mimalloc = { version = "0.1.48"#g' crates/zed/Cargo.toml
-          cargo add mimalloc --features override,no_thp,v3 -p zed
+          sed -i 's#mimalloc = { version = "0.1"#mimalloc = { version = "0.1.48"#g' crates/zed/Cargo.toml || true
+          cargo add mimalloc --features override,no_thp,v3 -p zed || true
 
       - name: Fix upstream bugs
         shell: bash
