@@ -102,6 +102,9 @@ jobs:
 
           cd zed_loc
           git clone --depth 1 https://github.com/zed-industries/zed
+          cd zed
+          git log > zed_last_commit.txt
+          cd  ..
           if [ "${{ github.event.inputs.TRANSLATION }}" = "true" ]; then
               python3 replace.py
           fi
@@ -112,7 +115,7 @@ jobs:
         run: |
           cd zed_loc/zed
           git clone --depth 1 https://github.com/reigadegr/zed-translation zed_translation
-          python zed_translation/2.trans.py
+          python3 zed_translation/2.trans.py
           git diff | wc -l
           rm -rf zed_translation .git rust-toolchain.toml || true
 

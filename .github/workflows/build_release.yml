@@ -18,7 +18,9 @@ on:
         default: "x86_64-pc-windows-msvc"
         options:
           - "x86_64-unknown-linux-gnu"
+          - "aarch64-unknown-linux-gnu"
           - "x86_64-pc-windows-msvc"
+          - "aarch64-pc-windows-msvc"
           - "aarch64-apple-darwin"
           - "x86_64-apple-darwin"
       TRANSLATION:
@@ -137,7 +139,7 @@ jobs:
       matrix:
         include:
           # Platform builds
-          - os: ${{ contains(github.event.inputs.TARGET, 'windows') && 'windows' || (contains(github.event.inputs.TARGET, 'apple') && 'macos' || 'ubuntu') }}-latest-${{ contains(github.event.inputs.TARGET, 'aarch64') && 'arm' }}
+          - os: ${{ contains(github.event.inputs.TARGET, 'windows') && 'windows' || (contains(github.event.inputs.TARGET, 'apple') && 'macos' || 'ubuntu') }}-${{ contains(github.event.inputs.TARGET, 'windows') && '11' || (contains(github.event.inputs.TARGET, 'apple') && 'latest' || '24.04') }}${{ contains(github.event.inputs.TARGET, 'aarch64') && !contains(github.event.inputs.TARGET, 'apple') && '-arm' || '' }}
             target: ${{ github.event.inputs.TARGET }}
             cross: ${{ contains(github.event.inputs.TARGET, 'linux') && 'true' || 'false' }}
     steps:
