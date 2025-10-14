@@ -111,7 +111,7 @@ jobs:
           git diff | wc -l
           rm -rf zed_translation .git rust-toolchain.toml || true
 
-      - name: "📤 Upload preprocessing code
+      - name: "📤 Upload preprocessing code"
         uses: actions/upload-artifact@v4
         with:
           name: zed_preprocessing_code
