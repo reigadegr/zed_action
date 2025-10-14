@@ -93,18 +93,21 @@ jobs:
       - name: Clone zed sources
         shell: bash
         run: |
-          git clone --depth 1 https://github.com/zed-industries/zed zed_tmpdir
-          cd zed_tmpdir/
+          git clone --depth 1 https://github.com/tc999/zed-loc zed_loc
+          cd zed_loc
+          git clone --depth 1 https://github.com/zed-industries/zed
+          python3 replace.py
+          
           rm -rf .git rust-toolchain.toml || true
 
       - name: Localize Zed into Chinese
         if: ${{ github.event.inputs.TRANSLATION == 'true' }}
         shell: bash
         run: |
-          cd zed_tmpdir
+          cd zed_loc/zed
           git clone --depth 1 https://github.com/reigadegr/zed-translation zed_translation
           python zed_translation/2.trans.py
-          git diff | head -n 200
+          git diff | wc -l
           rm -rf zed_translation
 
       - name: Upload preprocessing code
@@ -112,7 +115,7 @@ jobs:
         with:
           name: zed_preprocessing_code
           compression-level: 1
-          path: zed_tmpdir/*
+          path: zed_loc/zed/*
 
   # Build zed binaries
   build-zed:
