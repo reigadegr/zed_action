@@ -206,7 +206,7 @@ jobs:
           platform="${{ contains(github.event.inputs.TARGET, 'windows') && 'windows' || (contains(github.event.inputs.TARGET, 'apple') && 'apple' || 'linux') }}"
           file="build_"$toolchain"_"$platform".sh"
 
-          url="https://github.com/reigadegr/zed_action/raw/main/$file"
+          url="https://github.com/reigadegr/zed_action/raw/main/script/$file"
           echo "脚本直链: $url"
           curl -L $url -o "$file"
           cat "$file"; ls -al
