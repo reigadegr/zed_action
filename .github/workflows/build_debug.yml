@@ -221,6 +221,7 @@ jobs:
           mkdir -p ${{ github.event.inputs.TARGET }}_module || echo "已有默认目录"
           dd if=target/"${{ matrix.target }}"/release/$bin_name of=./"${{ matrix.target }}"_module/$bin_name
           git log > ./"${{ matrix.target }}"_module/commits.txt
+          cp -af zed_last_commit.txt ./"${{ matrix.target }}"_module/zed_last_commit.txt || true
 
       - name: Fix post setup rust environment step
         shell: bash
