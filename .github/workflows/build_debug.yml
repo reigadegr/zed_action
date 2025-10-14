@@ -136,7 +136,7 @@ jobs:
       matrix:
         include:
           # Platform builds
-          - os: ${{ contains(github.event.inputs.TARGET, 'windows') && 'windows' || (contains(github.event.inputs.TARGET, 'apple') && 'macos' || 'ubuntu') }}-latest
+          - os: ${{ contains(github.event.inputs.TARGET, 'windows') && 'windows' || (contains(github.event.inputs.TARGET, 'apple') && 'macos' || 'ubuntu') }}-latest-${{ contains(github.event.inputs.TARGET, 'aarch64') && 'arm' }}
             target: ${{ github.event.inputs.TARGET }}
             cross: ${{ contains(github.event.inputs.TARGET, 'linux') && 'true' || 'false' }}
     steps:
