@@ -1,9 +1,7 @@
-# Zed Action
+# Zed Editor 自动化构建系统
 
 ## Deepwiki
 [![DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/reigadegr/zed_action)
-
-# Zed Editor 自动化构建系统
 
 <p align="center">
   <img src="https://img.shields.io/badge/Rust-nightly%20%7C%20stable-orange" alt="Rust Version">
@@ -15,7 +13,7 @@
 
 ## ✨ 特性
 
-- 🚀 **多平台支持**: Linux (x86_64/aarch64)、Windows (x86_64)、macOS (x86_64/Apple Silicon)
+- 🚀 **多平台支持**: Linux (x86_64)、Windows (x86_64)、macOS (x86_64/Apple Silicon)
 - 🔧 **双工具链**: 支持 Rust stable 和 nightly 工具链
 - 🌏 **中文本地化**: 可选集成 tc999/zed-loc 和 reigadegr/zed-translation
 - ⚡ **性能优化**: 内置编译器优化补丁和内存管理调优
@@ -112,7 +110,6 @@ libasound2-dev, libx11-xcb-dev, libxkbcommon-dev
 
 ### 优化手段
 
-- `patchs/zigbuild_mimalloc.patch`: cargo-zigbuild 内存分配器补丁
 - `.cargo/config.toml`: Cargo 构建配置
 
 ## 📝 许可证
