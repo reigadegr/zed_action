@@ -19,6 +19,7 @@ export RUSTFLAGS="
     -C relro-level=none
     -C code-model=small
     -C target-cpu=native
+    -C force-frame-pointers=no
     -C target-feature=+crt-static
     -C symbol-mangling-version=v0
 " 
