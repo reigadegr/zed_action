@@ -201,13 +201,6 @@ jobs:
           git log > ./"${{ matrix.target }}"_module/commits.txt
           cp -af zed_last_commit.txt ./"${{ matrix.target }}"_module/zed_last_commit.txt || true
 
-      - name: "🤔 Fix post setup rust environment step"
-        shell: bash
-        run: |
-          rm -rf .github/actions/setup || echo "不需要删除目录"
-          mkdir -p .github/actions/setup || echo "不需要创建目录"
-          curl -L https://github.com/reigadegr/zed_action/raw/main/.github/actions/setup/action.yml -o .github/actions/setup/action.yml
-
       - name: "📤 Upload to GitHub artifacts"
         uses: actions/upload-artifact@v4
         with:
