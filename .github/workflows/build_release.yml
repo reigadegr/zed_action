@@ -71,6 +71,11 @@ jobs:
           - os: "ubuntu-latest"
             target: ${{ github.event.inputs.TARGET }}
     steps:
+      - name: "💾 Checkout repository"
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
       - name: "📦 Install system dependencies (Ubuntu)"
         uses: awalsh128/cache-apt-pkgs-action@latest 
         with: 
@@ -132,11 +137,6 @@ jobs:
           - os: ${{ contains(github.event.inputs.TARGET, 'windows') && 'windows' || (contains(github.event.inputs.TARGET, 'apple') && 'macos' || 'ubuntu') }}-${{ contains(github.event.inputs.TARGET, 'linux') && '24.04' || contains(github.event.inputs.TARGET, 'apple') && 'latest' || contains(github.event.inputs.TARGET, 'aarch64') && '11' || 'latest' }}${{ contains(github.event.inputs.TARGET, 'aarch64') && !contains(github.event.inputs.TARGET, 'apple') && '-arm' || '' }}
             target: ${{ github.event.inputs.TARGET }}
     steps:
-      - name: "💾 Checkout repository"
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
       - name: "🚀 Setup Rust environment"
         uses: ./.github/actions/setup
         with:
@@ -200,13 +200,6 @@ jobs:
           dd if=target/"${{ matrix.target }}"/release/$bin_name of=./"${{ matrix.target }}"_module/$bin_name
           git log > ./"${{ matrix.target }}"_module/commits.txt
           cp -af zed_last_commit.txt ./"${{ matrix.target }}"_module/zed_last_commit.txt || true
-
-      - name: "🤔 Fix post setup rust environment step"
-        shell: bash
-        run: |
-          rm -rf .github/actions/setup || echo "不需要删除目录"
-          mkdir -p .github/actions/setup || echo "不需要创建目录"
-          curl -L https://github.com/reigadegr/zed_action/raw/main/.github/actions/setup/action.yml -o .github/actions/setup/action.yml
 
       - name: "📤 Upload to GitHub artifacts"
         uses: actions/upload-artifact@v4

@@ -32,6 +32,11 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: "💾 Checkout repository"
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+
     - name: Install system dependencies (Ubuntu)
       if: runner.os == 'Linux'
       uses: awalsh128/cache-apt-pkgs-action@latest 
@@ -102,11 +107,3 @@ runs:
       run: |
         New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" `
           -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
-
-    - name: reinstall self code
-      shell: bash
-      run: |
-        git clone --depth 1 https://github.com/reigadegr/zed_action zed_action_sources
-        cp -rf zed_action_sources/*  .
-        cp -rf zed_action_sources/.*  . || echo "可能是macos，不需要单独cp.*"
-        rm -rf zed_action_sources
