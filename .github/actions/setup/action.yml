@@ -32,11 +32,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: "💾 Checkout repository"
-      uses: actions/checkout@v5
-      with:
-        fetch-depth: 0
-
     - name: Install system dependencies (Ubuntu)
       if: runner.os == 'Linux'
       uses: awalsh128/cache-apt-pkgs-action@latest 
