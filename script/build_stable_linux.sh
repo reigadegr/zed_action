@@ -21,6 +21,7 @@ export RUSTFLAGS+="
     --cfg tokio_unstable
 "
 
+echo $RUSTFLAGS
 # cargo update
 
 export CARGO_TERM_COLOR=always

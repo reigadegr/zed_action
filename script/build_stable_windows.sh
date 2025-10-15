@@ -8,12 +8,17 @@ export RUSTFLAGS="
     -C symbol-mangling-version=v0
 " 
 
+if [ ! -z "$(echo "$1" | grep "aarch64")" ]; then
+    export RUSTFLAGS="$RUSTFLAGS -C target-feature=-fullfp16"
+fi
+
 export RUSTFLAGS="
     $RUSTFLAGS
     --cfg tokio_unstable 
     --cfg windows_slim_errors
 "
 
+echo $RUSTFLAGS
 # cargo update
 
 export CARGO_TERM_COLOR=always
