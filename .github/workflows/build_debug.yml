@@ -71,24 +71,19 @@ jobs:
           - os: "ubuntu-latest"
             target: ${{ github.event.inputs.TARGET }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
-      - name: Install system dependencies (Ubuntu)
+      - name: "📦 Install system dependencies (Ubuntu)"
         uses: awalsh128/cache-apt-pkgs-action@latest 
         with: 
           packages: llvm clang git python3 python-is-python3
           execute_install_scripts: true
 
-      - name: Configure Git
+      - name: "⚙️ Configure Git"
         shell: bash
         run: |
           git config --global user.name "Numbersf"
           git config --global user.email "263623064@qq.com"
 
-      - name: Clone zed sources
+      - name: "⬇️ Clone zed sources"
         shell: bash
         run: |
           if [ "${{ github.event.inputs.TRANSLATION }}" = "true" ]; then
@@ -106,7 +101,7 @@ jobs:
               python3 replace.py
           fi
 
-      - name: Localize Zed into Chinese
+      - name: "🔧 Localize Zed into Chinese"
         if: ${{ github.event.inputs.TRANSLATION == 'true' }}
         shell: bash
         run: |
@@ -116,7 +111,7 @@ jobs:
           git diff | wc -l
           rm -rf zed_translation .git rust-toolchain.toml || true
 
-      - name: Upload preprocessing code
+      - name: "📤 Upload preprocessing code"
         uses: actions/upload-artifact@v4
         with:
           name: zed_preprocessing_code
@@ -137,64 +132,49 @@ jobs:
           - os: ${{ contains(github.event.inputs.TARGET, 'windows') && 'windows' || (contains(github.event.inputs.TARGET, 'apple') && 'macos' || 'ubuntu') }}-${{ contains(github.event.inputs.TARGET, 'linux') && '24.04' || contains(github.event.inputs.TARGET, 'apple') && 'latest' || contains(github.event.inputs.TARGET, 'aarch64') && '11' || 'latest' }}${{ contains(github.event.inputs.TARGET, 'aarch64') && !contains(github.event.inputs.TARGET, 'apple') && '-arm' || '' }}
             target: ${{ github.event.inputs.TARGET }}
     steps:
-      - name: Checkout repository
+      - name: "💾 Checkout repository"
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - name: Setup Rust environment
+      - name: "🚀 Setup Rust environment"
         uses: ./.github/actions/setup
         with:
           rust-version: ${{ github.event.inputs.TOOLCHAINS }}
           target: ${{ matrix.target }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Configure Git
+      - name: "⚙️ Configure Git"
         shell: bash
         run: |
           git config --global user.name "Numbersf"
           git config --global user.email "263623064@qq.com"
 
-      - name: Setup TimeZone
+      - name: "🔧 Setup TimeZone"
         if: runner.os == 'Linux'
         run: |
           sudo -E rm -rf /etc/localtime
           sudo -E ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
-      - name: Download zed preprocessing code
+      - name: "📥 Download zed preprocessing code"
         uses: actions/download-artifact@v4
         with:
           name: zed_preprocessing_code
 
-      - name: Replace mallocator
+      - name: "🔧 Replace mallocator"
         shell: bash
         run: |
           sed -i 's#mimalloc = { version = "0.1"#mimalloc = { version = "0.1.48"#g' crates/zed/Cargo.toml || true
           cargo add mimalloc --features override,no_thp,v3 -p zed || true
 
-      - name: Fix upstream bugs
-        shell: bash
-        run: |
-          git init || echo "无需init"
-          rm -rf target && echo "删除了target" || echo "无需删除"
-          git add  . && git commit -m "auto commit"
-
-          for i in "full_opt.patch"; do
-             url="https://github.com/reigadegr/zed_action/raw/main/patchs/$i"
-             echo "补丁直链: $url"
-             curl -L $url -o "$i"
-             patch -p1 -F 3 < $i && git add  . && git commit -m "$i commit" || git reset --hard
-             git clean -df
-          done
-
-      - name: Reset flags
+      - name: "⚙️ Reset flags"
         shell: bash
         run: |
           mkdir -p .cargo/ || echo "无需mkdir"
           rm -f .cargo/config.toml || echo "无需删除profile"
           curl -L https://github.com/reigadegr/zed_action/raw/main/.cargo/config_debug.toml -o .cargo/config.toml
 
-      - name: Build zed
+      - name: "🔨 Build zed"
         shell: bash
         run: |
           rm -rf target && echo "删除了target" || echo "无需删除"
@@ -221,14 +201,14 @@ jobs:
           git log > ./"${{ matrix.target }}"_module/commits.txt
           cp -af zed_last_commit.txt ./"${{ matrix.target }}"_module/zed_last_commit.txt || true
 
-      - name: Fix post setup rust environment step
+      - name: "🤔 Fix post setup rust environment step"
         shell: bash
         run: |
           rm -rf .github/actions/setup || echo "不需要删除目录"
           mkdir -p .github/actions/setup || echo "不需要创建目录"
           curl -L https://github.com/reigadegr/zed_action/raw/main/.github/actions/setup/action.yml -o .github/actions/setup/action.yml
 
-      - name: Upload to GitHub artifacts
+      - name: "📤 Upload to GitHub artifacts"
         uses: actions/upload-artifact@v4
         with:
           name: ${{ github.event.inputs.TARGET }}_zed
