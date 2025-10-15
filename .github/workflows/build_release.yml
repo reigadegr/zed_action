@@ -87,7 +87,7 @@ jobs:
         shell: bash
         run: |
           if [ "${{ github.event.inputs.TRANSLATION }}" = "true" ]; then
-              git clone --depth 1 https://github.com/tc999/zed-loc zed_loc
+              git clone --depth 1 https://github.com/reigadegr/zed-loc zed_loc
           else
               mkdir zed_loc
           fi
