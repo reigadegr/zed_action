@@ -175,8 +175,8 @@ jobs:
       - name: "⚙️ Reset flags"
         shell: bash
         run: |
-          mkdir -p .cargo/ || echo "无需mkdir"
-          rm -f .cargo/config.toml || echo "无需删除profile"
+          rm -rf .cargo/ || echo "无需删除目录"
+          mkdir -p .cargo/
           curl -L https://github.com/reigadegr/zed_action/raw/main/.cargo/config_debug.toml -o .cargo/config.toml
 
       - name: "🔨 Build zed"
