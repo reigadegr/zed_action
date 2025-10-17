@@ -22,11 +22,6 @@ export RUSTFLAGS="
     -C force-frame-pointers=no
     -C target-feature=+crt-static
     -C symbol-mangling-version=v0
-    -C llvm-args=-enable-post-misched
-    -C link-args=/OPT:REF,ICF
-    -C link-args=/NXCOMPAT
-    -C link-args=/DEBUG:NONE
-    -C link-args=/PDB:NONE
 " 
 
 if [ ! -z "$(echo "$1" | grep "aarch64")" ]; then
