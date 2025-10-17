@@ -28,7 +28,6 @@ export RUSTFLAGS="
     -C llvm-args=-enable-dfa-jump-thread
     -C link-args=/OPT:REF,ICF
     -C link-args=/NXCOMPAT
-    -C link-args=/DYNAMICBASE
     -C link-args=/DEBUG:NONE
     -C link-args=/PDB:NONE
 " 
