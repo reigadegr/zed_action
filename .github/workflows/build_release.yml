@@ -27,7 +27,7 @@ on:
         type: choice
         description: "使用的配置文件"
         required: true
-        default: "config.toml"
+        default: "config_micro_opt.toml"
         options:
           - "config.toml"
           - "config_debug.toml"
