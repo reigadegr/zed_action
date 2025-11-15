@@ -23,6 +23,15 @@ on:
           - "aarch64-pc-windows-msvc"
           - "aarch64-apple-darwin"
           - "x86_64-apple-darwin"
+      CONFIG:
+        type: choice
+        description: "使用的配置文件"
+        required: true
+        default: "config.toml"
+        options:
+          - "config.toml"
+          - "config_debug.toml"
+          - "config_micro_opt.toml"
       TRANSLATION:
         type: boolean
         description: "是否汉化？"
@@ -177,7 +186,7 @@ jobs:
         run: |
           rm -rf .cargo/ || echo "无需删除目录"
           mkdir -p .cargo/
-          curl -L https://github.com/reigadegr/zed_action/raw/main/.cargo/config.toml -o .cargo/config.toml
+          curl -L https://github.com/reigadegr/zed_action/raw/main/.cargo/${{ github.event.inputs.CONFIG }} -o .cargo/config.toml
 
       - name: "🔨 Build zed"
         shell: bash
