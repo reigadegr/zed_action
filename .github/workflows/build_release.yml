@@ -29,7 +29,7 @@ on:
         required: true
         default: "config_micro_opt.toml"
         options:
-          - "config.toml"
+          - "config_full_opt.toml"
           - "config_debug.toml"
           - "config_micro_opt.toml"
       TRANSLATION:
